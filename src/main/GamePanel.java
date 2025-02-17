@@ -6,10 +6,14 @@ package main;
 
 import Inputs.KeyboardInputs;
 import Inputs.MouseInputs;
-import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.Random;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -21,17 +25,17 @@ public class GamePanel extends JPanel{
     
     MouseInputs mouse;
     private float xDelta = 100, yDelta = 100;
-    private float xDir = 1f, yDir = 1f;
     private int frames;
     private long lastChecked = System.currentTimeMillis();
-    private Color color = new Color(150,150,150);
-    private Random random;  
+
+    private BufferedImage img;
     
     public GamePanel()
     {
-        random = new Random();
-        mouse = new MouseInputs(this);
+        importImg();
         
+        mouse = new MouseInputs(this);
+        setPanelSize();
         addKeyListener(new KeyboardInputs(this));
         addMouseListener(mouse);
         addMouseMotionListener(mouse);
@@ -64,37 +68,30 @@ public class GamePanel extends JPanel{
     {
         super.paintComponent(g);
         
-        
-        updateRectangle();
-        g.setColor(this.color);
-        g.fillRect((int)xDelta, (int)yDelta, 100, 100);
-
+        g.drawImage(img.getSubimage(0, 0, 64, 40), 0, 0, 128, 80, null);
        
     }
     
-    public void updateRectangle()
-    {
-        xDelta += xDir;
-        if(xDelta > 400 || xDelta < 0)
-        {
-            xDir *= -1;
-            color = getRndColor();
-        }
-        yDelta += yDir;
-        if(yDelta > 400 || yDelta < 0)
-        {
-            yDir *= -1;
-            color = getRndColor();
-        }
+
+
+    private void setPanelSize() {
+        Dimension size = new Dimension(1280,800);
+        setMinimumSize(size);
+        setPreferredSize(size);
+        setMaximumSize(size);
     }
-    
-    private Color getRndColor()
-    {
-        int r = random.nextInt(255), 
-            g = random.nextInt(255), 
-            b = random.nextInt(255);
+
+    private void importImg() {
         
-        return new Color(r,g,b);
+        InputStream is = getClass().getResourceAsStream("/player_sprites.png");
+        
+        try {
+            img = ImageIO.read(is);
+        } 
+        catch (IOException ex) 
+        {
+           ex.printStackTrace();
+        }
     }
     
 
