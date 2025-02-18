@@ -14,8 +14,8 @@ import static utils.Constants.Directions.LEFT;
 import static utils.Constants.Directions.RIGHT;
 import static utils.Constants.Directions.UP;
 import static utils.Constants.PlayerConstants.GetSpriteAmount;
-import static utils.Constants.PlayerConstants.PLAYER_IDLE;
-import static utils.Constants.PlayerConstants.PLAYER_RUNNING;
+import static utils.Constants.PlayerConstants.*;
+
 
 /**
  *
@@ -31,7 +31,7 @@ public class Player extends Entity{
     
     private boolean up, down, left, right;
     
-    private boolean moving = false;
+    private boolean moving = false, attacking = false;
     private float playSpeed = 2.0f;
     
     public Player(float x, float y) 
@@ -81,7 +81,12 @@ public class Player extends Entity{
         
     }
     
-        private void updateAimationTick() {
+    public void setAttack(boolean attacking)
+    {
+        this.attacking = attacking;
+    }
+    
+    private void updateAimationTick() {
         
         aniTick++;
         
@@ -89,13 +94,20 @@ public class Player extends Entity{
         {
             aniTick = 0;
             aniIndex++;
-            if(aniIndex >= GetSpriteAmount(playerAction)) aniIndex = 0; 
+            if(aniIndex >= GetSpriteAmount(playerAction))
+            {
+                aniIndex = 0; 
+                attacking = false;
+            }
+                
         }
         
     }
     
     public void setAnimation()
     {
+        int startAni = playerAction;
+        
         if(moving)
         {
             playerAction = PLAYER_RUNNING;
@@ -104,6 +116,20 @@ public class Player extends Entity{
         {
             playerAction = PLAYER_IDLE;
         }
+        
+        if(attacking)
+            playerAction = PLAYER_ATTACK;
+        
+        if(startAni != playerAction)
+        {
+            resetAni();
+        }
+    }
+    
+    public void resetAni()
+    {
+        aniTick = 0;
+        aniIndex = 0;
     }
     
     public void updatePos()
@@ -160,6 +186,13 @@ public class Player extends Entity{
 
     public void setRight(boolean right) {
         this.right = right;
+    }
+
+    public void resetDirBool() {
+        left = false;
+        right = false;
+        up = false;
+        down = false;
     }
     
     
